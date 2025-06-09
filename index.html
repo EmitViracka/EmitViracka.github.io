@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>METODOS NUMERICOS</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background-color: #1a1a2e;
+             color: #e6e6e6;
+        }
+        .section { 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background-color: #16213e;
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+            transition: all 0.3s ease;
+            border: 1px solid #2a3d66;
+        }
+        h1 { 
+            text-align: center; 
+            color: #4cc9f0; 
+            margin-bottom: 30px; 
+            padding-bottom: 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        h2 { 
+            color: #4cc9f0; 
+            border-bottom: 2px solid #ccc; 
+            padding-bottom: 8px; 
+            margin-top: 25px;
+            font-size: 1.5rem;
+        }
+        .section:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        canvas { 
+            background-color: white; 
+            border: 1px solid #ddd; 
+            margin-top: 15px; 
+            margin-bottom: 15px;
+            max-height: 400px;
+        }
+        table, th, td { 
+            border: 1px solid #2a3d66; 
+            border-collapse: collapse; 
+            padding: 8px; 
+        }
+        th { 
+            background-color: #2a3d66;
+            color: #ffffff; 
+            font-weight: 600;
+        }
+        table { 
+            width: 100%; 
+            margin-top: 15px; 
+            margin-bottom: 15px;
+            color: #000000;
+            background-color: #f8f9fa;; 
+            font-size: 0.9rem;
+        }
+        .conclusion { 
+            background: #1a1a2e;; 
+            padding: 15px; 
+            margin-top: 20px; 
+            border-left: 4px solid #4a89dc;
+            border-radius: 0 5px 5px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #e6e6e6;
+        }
+        .problem-image {
+            max-width: 80%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-problem {
+            margin: 5px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        /* Cambiamos el manejo de las secciones */
+        .section {
+            display: none; /* Todas ocultas por defecto */
+        }
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .method-comparison {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .method-card {
+            width: 45%;
+            min-width: 300px;
+            padding: 15px;
+            margin: 10px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            color: #000000;
+        }
+        .method-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MÉTODOS NUMÉRICOS: HEUN Y RUNGE KUTTA 4TO ORDEN</h1>
+        
+        <div class="btn-container">
+            <button class="btn btn-primary btn-problem" onclick="showSection('tumor-section')">Crecimiento Tumoral</button>
+            <button class="btn btn-success btn-problem" onclick="showSection('fall-section')">Caída Libre</button>
+            <button class="btn btn-info btn-problem" onclick="showSection('pop-section')">Crecimiento Poblacional</button>
+        </div>
+
+        <div class="section active" id="tumor-section">
+            <!-- Contenido del problema 1 -->
+            <h2>Problema 1: Crecimiento Tumoral</h2>
+            <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                 alt="Modelo de crecimiento tumoral" class="problem-image">
+            <p>Modelo de crecimiento tumoral con ecuación diferencial: dA/dt = 0.8A(1 - (A/60)^0.25</p>
+            
+            <div class="method-comparison">
+                <div class="method-card">
+                    <div class="method-title">Método de Heun</div>
+                    <p>Método predictor-corrector que mejora la precisión del método de Euler usando un promedio de pendientes.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Runge-Kutta 4to Orden</div>
+                    <p>Método de alta precisión que utiliza cuatro evaluaciones de la función por paso para aproximar la solución.</p>
+                </div>
+            </div>
+            
+            <canvas id="tumorChart"></canvas>
+            <table id="tumorTable"></table>
+            <div class="conclusion" id="tumorConclusion"></div>
+        </div>
+
+        <div class="section" id="fall-section">
+            <!-- Contenido del problema 2 -->
+            <h2>Problema 2: Caída Libre con Resistencia del Aire</h2>
+            <img src="https://images.unsplash.com/photo-1502134249126-9f3755a50d78?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                 alt="Caída libre con resistencia" class="problem-image">
+            <p>Modelo de caída libre con resistencia del aire: m·dv/dt = -mg + 0.05v² (m=5kg)</p>
+            
+            <div class="method-comparison">
+                <div class="method-card">
+                    <div class="method-title">Método de Heun</div>
+                    <p>En problemas de dinámica, Heun puede capturar mejor la transición hacia la velocidad terminal que el método de Euler.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Runge-Kutta 4to Orden</div>
+                    <p>Ideal para sistemas dinámicos no lineales, proporciona una excelente aproximación de la velocidad terminal.</p>
+                </div>
+            </div>
+            
+            <canvas id="fallChart"></canvas>
+            <table id="fallTable"></table>
+            <div class="conclusion" id="fallConclusion"></div>
+        </div>
+
+        <div class="section" id="pop-section">
+            <!-- Contenido del problema 3 -->
+            <h2>Problema 3: Crecimiento Poblacional</h2>
+            <img src="https://images.unsplash.com/photo-1527525443983-6e60c75fff46?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" 
+                 alt="Crecimiento poblacional" class="problem-image">
+            <p>Modelo logístico de crecimiento poblacional: dN/dt = 0.000095N(5000 - N)</p>
+            
+            <div class="method-comparison">
+                <div class="method-card">
+                    <div class="method-title">Método de Heun</div>
+                    <p>Para modelos poblacionales, Heun ofrece mejor precisión que Euler, especialmente cerca de la capacidad de carga.</p>
+                </div>
+                <div class="method-card">
+                    <div class="method-title">Runge-Kutta 4to Orden</div>
+                    <p>Proporciona la mejor aproximación para el comportamiento asintótico de la población hacia la capacidad máxima.</p>
+                </div>
+            </div>
+            
+            <canvas id="popChart"></canvas>
+            <table id="popTable"></table>
+            <div class="conclusion" id="popConclusion"></div>
+        </div>
+    </div>
+
+    <script>
+        // Función para mostrar secciones (versión corregida)
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Mostrar la sección seleccionada
+            const section = document.getElementById(sectionId);
+            section.classList.add('active');
+            
+            // Scroll suave a la sección
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Re-renderizar los gráficos (por si hay problemas de visualización)
+            setTimeout(() => {
+                if (sectionId === 'tumor-section' && window.tumorChart) {
+                    window.tumorChart.update();
+                } else if (sectionId === 'fall-section' && window.fallChart) {
+                    window.fallChart.update();
+                } else if (sectionId === 'pop-section' && window.popChart) {
+                    window.popChart.update();
+                }
+            }, 300);
+        }
+
+        // Implementación de los métodos numéricos
+        function heun(f, y0, t0, h, n) {
+            let t = [t0], y = [y0];
+            for (let i = 1; i <= n; i++) {
+                let f1 = f(t[i-1], y[i-1]);
+                let yp = y[i-1] + h * f1;
+                let f2 = f(t[i-1] + h, yp);
+                y.push(y[i-1] + h/2 * (f1 + f2));
+                t.push(t[i-1] + h);
+            }
+            return { t, y };
+        }
+
+        function rk4(f, y0, t0, h, n) {
+            let t = [t0], y = [y0];
+            for (let i = 1; i <= n; i++) {
+                let ti = t[i-1], yi = y[i-1];
+                let k1 = f(ti, yi);
+                let k2 = f(ti + h/2, yi + h/2 * k1);
+                let k3 = f(ti + h/2, yi + h/2 * k2);
+                let k4 = f(ti + h, yi + h * k3);
+                y.push(yi + h/6 * (k1 + 2*k2 + 2*k3 + k4));
+                t.push(ti + h);
+            }
+            return { t, y };
+        }
+
+        function generateTable(id, t, y1, y2, label1, label2) {
+            const table = document.getElementById(id);
+            let html = `<tr><th>t</th><th>${label1}</th><th>${label2}</th><th>Diferencia</th></tr>`;
+            for (let i = 0; i < t.length; i++) {
+                const diff = Math.abs(y1[i] - y2[i]).toFixed(6);
+                html += `<tr>
+                    <td>${t[i].toFixed(2)}</td>
+                    <td>${y1[i].toFixed(6)}</td>
+                    <td>${y2[i].toFixed(6)}</td>
+                    <td>${diff}</td>
+                </tr>`;
+            }
+            table.innerHTML = html;
+        }
+
+        function setConclusion(id, conclusion) {
+            document.getElementById(id).innerHTML = 
+                `<strong>Conclusión:</strong> ${conclusion}<br><br>
+                 <strong>Análisis:</strong> ${getAnalysis(conclusion)}`;
+        }
+
+        function getAnalysis(problem) {
+            if (problem.includes("tumor")) {
+                return "El método RK4 muestra mayor estabilidad en el crecimiento tumoral, especialmente cuando la tasa de crecimiento comienza a disminuir debido a limitaciones de recursos. Heun puede sobrestimar ligeramente el tamaño en fases intermedias.";
+            } else if (problem.includes("caída")) {
+                return "RK4 aproxima mejor la velocidad terminal, mostrando una transición más suave. Heun puede presentar pequeñas oscilaciones antes de estabilizarse. La diferencia es más notable en los primeros segundos.";
+            } else {
+                return "Para el crecimiento poblacional, ambos métodos capturan bien la forma sigmoide, pero RK4 es más preciso cerca de la capacidad de carga (5000 individuos). Heun tiende a converger más lentamente al valor límite.";
+            }
+        }
+
+        function plotChart(canvasId, t, y1, y2, label1, label2, color1, color2) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            
+            // Destruir el gráfico anterior si existe
+            if (window[canvasId + 'Chart']) {
+                window[canvasId + 'Chart'].destroy();
+            }
+            
+            window[canvasId + 'Chart'] = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: t.map(x => x.toFixed(1)),
+                    datasets: [
+                        { 
+                            label: label1, 
+                            data: y1, 
+                            borderColor: color1, 
+                            backgroundColor: color1 + '20',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            fill: false 
+                        },
+                        { 
+                            label: label2, 
+                            data: y2, 
+                            borderColor: color2, 
+                            backgroundColor: color2 + '20',
+                            borderWidth: 2,
+                            tension: 0.1,
+                            fill: false 
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparación de Métodos Numéricos',
+                            font: { size: 16 }
+                        },
+                        legend: { position: 'top' },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Tiempo' }
+                        },
+                        y: {
+                            title: { display: true, text: 'Valor' }
+                        }
+                    },
+                    animation: {
+                        duration: 1000
+                    }
+                }
+            });
+        }
+
+        // Inicialización de los gráficos y tablas
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tumor
+            let tumorFunc = (t, A) => 0.8 * A * (1 - Math.pow(A / 60, 0.25));
+            let tumorHeun = heun(tumorFunc, 1, 0, 1, 30);
+            let tumorRK4 = rk4(tumorFunc, 1, 0, 1, 30);
+            plotChart("tumorChart", tumorHeun.t, tumorHeun.y, tumorRK4.y, "Heun", "RK4", "#FFA500", "#0066CC");
+            generateTable("tumorTable", tumorHeun.t, tumorHeun.y, tumorRK4.y, "A Heun", "A RK4");
+            setConclusion("tumorConclusion", "Ambos métodos muestran un crecimiento continuo del tumor, pero RK4 proporciona una solución más suave y estable, especialmente cuando el crecimiento comienza a ralentizarse. La diferencia máxima entre métodos es de " + 
+                Math.max(...tumorHeun.y.map((val, idx) => Math.abs(val - tumorRK4.y[idx]))).toFixed(4) + " unidades.");
+
+            // Caída libre
+            let fallFunc = (t, v) => (-5 * 9.81 + 0.05 * v * v) / 5;
+            let fallHeun = heun(fallFunc, 0, 0, 0.1, 150);
+            let fallRK4 = rk4(fallFunc, 0, 0, 0.1, 150);
+            plotChart("fallChart", fallHeun.t, fallHeun.y, fallRK4.y, "Heun", "RK4", "#28A745", "#343A40");
+            generateTable("fallTable", fallHeun.t, fallHeun.y, fallRK4.y, "v Heun (m/s)", "v RK4 (m/s)");
+            setConclusion("fallConclusion", "RK4 alcanza la velocidad terminal (~31.32 m/s) más rápidamente y con menos oscilaciones que Heun. La diferencia máxima de velocidad es " + 
+                Math.max(...fallHeun.y.map((val, idx) => Math.abs(val - fallRK4.y[idx]))).toFixed(4) + " m/s en los primeros segundos.");
+
+            // Población
+            let popFunc = (t, N) => 0.000095 * N * (5000 - N);
+            let popHeun = heun(popFunc, 100, 0, 1, 20);
+            let popRK4 = rk4(popFunc, 100, 0, 1, 20);
+            plotChart("popChart", popHeun.t, popHeun.y, popRK4.y, "Heun", "RK4", "#6F42C1", "#DC3545");
+            generateTable("popTable", popHeun.t, popHeun.y, popRK4.y, "N Heun", "N RK4");
+            setConclusion("popConclusion", "RK4 predice una aproximación más precisa al límite de capacidad (5000 individuos), mientras Heun muestra un ligero retraso en la aproximación. La diferencia máxima es de " + 
+                Math.max(...popHeun.y.map((val, idx) => Math.abs(val - popRK4.y[idx]))).toFixed(0) + " individuos en la fase de crecimiento acelerado.");
+        });
+    </script>
+</body>
+</html>
